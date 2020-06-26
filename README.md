@@ -1,2 +1,8 @@
 # dlwr_project
-final project summer deep learning R VCU biostatistics
+Deep Learning With R - Final project
+  
+  Data type : 
+  Link to data source : 
+  Problem type : 
+  Proposed network architecture
+ 
