@@ -1,8 +1,10 @@
 # dlwr_project
+
 Deep Learning With R - Final project
   
-  Data type : 
-  Link to data source : 
-  Problem type : 
-  Proposed network architecture
+  Data type : images
+  Link to data source : https://www.kaggle.com/c/Kannada-MNIST/data
+  Problem type : Multiclass classification
+  Proposed network architecture : CNN(Convolutional Neural Networks)
+	Participants : Atiati, Dongho Shin
  
