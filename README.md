@@ -7,4 +7,5 @@ Deep Learning With R - Final project
   - Problem type : Multiclass classification
   - Proposed network architecture : CNN(Convolutional Neural Networks)
   - Participants : Atica F. Urmi, Dongho Shin
+  - Description : The goal of this project is to try&provide little bit extension to "digit recognizer" that covered in textbook. Instead of Arabic numbers, recently-released dataset of Kannada digits is used. by performing this project, we will practice and enhance our knowledge in Computer vision fundamentals including simple neural networks and classification methods. 
  
