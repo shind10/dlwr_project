@@ -6,5 +6,5 @@ Deep Learning With R - Final project
   - Link to data source : [Kannada-MNIST](https://www.kaggle.com/c/Kannada-MNIST/data)
   - Problem type : Multiclass classification
   - Proposed network architecture : CNN(Convolutional Neural Networks)
-  - Participants : Atiati, Dongho Shin
+  - Participants : Atica F. Urmi, Dongho Shin
  
