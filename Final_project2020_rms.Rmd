@@ -1,0 +1,132 @@
+---
+title: "Final_Project_Deep_Learning2020"
+author: "Dongho Shin,Faten Alamri, Atika Farzana Urmi"
+date: "7/10/2020"
+output: html_document
+---
+
+```{r}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### libraries ###
+
+
+```{r}
+ #install.packages("keras")
+library(keras)
+# install.packages("tidyverse")
+library(tidyverse)
+ library(reticulate)
+```
+
+### Loading Data set ###
+```{r}
+train_data <- read_csv("C:/Users/farza/Desktop/deep learning with r/train.csv")%>% select(-label) ## or we can manually do this like, train_data$lable=NULL ##
+train_labels <- read_csv("C:/Users/farza/Desktop/deep learning with r/train.csv") %>% select(label)
+test_data <- read_csv("C:/Users/farza/Desktop/deep learning with r/test.csv") %>% select(-id) ## or we can manually do this like, test_data$id=NULL ##
+val_data <- read_csv("C:/Users/farza/Desktop/deep learning with r/Dig-MNIST.csv") %>% select(-label)
+val_labels <- read_csv("C:/Users/farza/Desktop/deep learning with r/Dig-MNIST.csv") %>% select(label)
+```
+### Scale train and test data also, transform from table to matrix  ###
+```{r}
+x_train <- as.matrix(train_data) / 255
+x_test <- as.matrix(test_data) / 255
+x_val <- as.matrix(val_data) / 255
+```
+
+### Dimension redefine (Tensor reshaping : rearranging its rows and columns to match a target shape) ###
+```{r}
+nRows <- 28
+nCols <- 28
+x_train <- array_reshape(x_train, c(nrow(x_train), nRows, nCols, 1)) 
+x_val <- array_reshape(x_val, c(nrow(x_val), nRows, nCols, 1))
+x_test <- array_reshape(x_test, c(nrow(x_test), nRows, nCols, 1))
+input_shape <- c(nRows, nCols, 1)
+
+```
+### Some setting ###
+```{r}
+batch_size <- 128
+num_classes <- 10 
+epochs <- 5 # we can change this to get faster result # 
+```
+### Convert class vectors to binary class ###
+```{r}
+y_train <- to_categorical(as.matrix(train_labels), num_classes)
+y_val <- to_categorical(as.matrix(val_labels), num_classes)
+```
+### Model ###
+# For a multi-class classification. Our model is a stack of layers: the sequential model.
+```{r}
+
+# Adds a 2D Convolution Layer with 32 filters to the model: 
+# An integer or list of 2 integers, specifying the width and height of the 2D convolution window. 
+# kernel_size: Can be a single integer to specify the same value for all spatial dimensions.
+# activation is an Activation function to use. If you don't specify anything, no activation is applied 
+# Kernel_initializer is to Initializer for the bias vector.    
+# kernel_regularizer is a Regularizer function applied to the kernel weights matrix. 
+
+
+
+model <- keras_model_sequential()%>%
+  layer_conv_2d(filters = 32, 
+                kernel_size = c(3,3), kernel_initializer = 'he_normal', 
+                                # Each filter/kernel in the layer is randomly initialized to sdistribution (i.e. Normal, Gaussian, etc.). #
+                                # By having different initialization criteria, each filter gets trained slightly differently.             #
+                                # They eventually learn to detect different features in the image.                                        #
+                kernel_regularizer = 'l2',
+                activation = 'relu',
+                input_shape = input_shape) %>% # we defined input shape as c(28,28,1) from the above #
+  layer_batch_normalization() %>%
+  
+  layer_conv_2d(filters = 32, 
+                kernel_size = c(3,3), kernel_initializer = 'he_normal',
+                kernel_regularizer = 'l2',
+                input_shape = input_shape) %>% 
+  layer_batch_normalization() %>%
+  
+  layer_conv_2d(filters = 64, kernel_size = c(3,3), activation = 'relu') %>% 
+  # Max pooling operation for spatial data.
+  layer_max_pooling_2d(pool_size = c(2, 2)) %>% 
+  #Dropout consists in randomly setting a fraction rate of input units 
+  # to 0 at each update during training time, which helps prevent overfitting
+  layer_dropout(rate = 0.25) %>%
+  
+  layer_conv_2d(filters = 64, kernel_size = c(3,3), activation = 'relu') %>% 
+  layer_max_pooling_2d(pool_size = c(2, 2)) %>% 
+  layer_dropout(rate = 0.5) %>%
+  #Flatten a given input, does not affect the batch size.
+  layer_flatten() %>% 
+ # Adds a densely-connected layer with 64 units to the model:
+  layer_dense(units = 128, activation = 'relu') %>% 
+  layer_dropout(rate = 0.5) %>% 
+  # Add a softmax layer so it turns numbers as known as logits into probabilities that sum to one 
+  layer_dense(units = num_classes, activation = 'softmax')
+
+print(model)
+```
+## Compile model
+
+```{r}
+model %>% compile(
+  loss = loss_categorical_crossentropy,
+  optimizer = "rmsprop",    # we can do "rmsprop" as in the book too #
+  metrics = c('accuracy')
+)
+```
+## Train model
+```{r}
+history <- model %>% fit(
+  x_train, y_train,
+  batch_size = batch_size,
+  epochs = epochs,
+  verbose = 1,                         # verbose=0 (show nothing), verbose=1 (show progres bar). Doesn't really matter #
+  validation_data = list(x_val, y_val)
+)
+
+plot(history)
+model %>% evaluate(x_val, y_val, verbose = 0)
+preds <- model %>% predict_classes(x_test)
+```
+
+
